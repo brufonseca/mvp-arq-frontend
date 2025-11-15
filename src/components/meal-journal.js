@@ -10,6 +10,8 @@ export class MealJournal extends LitElement {
             :host {
                 display: block;
                 font-family: "Roboto", sans-serif;
+                height: 100%;
+                width: 100%;
             }
 
             *[hidden] {
@@ -36,9 +38,9 @@ export class MealJournal extends LitElement {
             }
 
             .container {
-                width: calc(100% - 20px);
-                height: 100%;
-                padding: 0 10px;
+                /* width: calc(100% - 20px);
+                height: calc( 100% - ;
+                padding: 0 10px; */
             }
 
             .left-container {
@@ -50,9 +52,21 @@ export class MealJournal extends LitElement {
             }
 
             #btnContainer{
-                margin: 10px 0;
-                
+                margin: 10px 10px;
+                height: 48px;
+                width: calc(100% - 20px);
             }
+
+            #tableContainer{
+                height: calc(100% - 68px - 140px);
+                width: 100%;
+            }
+
+            #formContainer{
+                height: calc(100% - 140px);
+                width: 100%;
+            }
+
 
             thead th {
                 width: 20%;
@@ -101,7 +115,7 @@ export class MealJournal extends LitElement {
             </div>
         </header>
 
-        <div id="btnContainer" class="container left-container" ?hidden="${this.insertMode}">
+        <div id="btnContainer" class="left-container" ?hidden="${this.insertMode}">
             <md-filled-tonal-button @click=${this._showForm}>
                 Adicionar Registro
                 <svg slot="icon" viewBox="0 0 24 24"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/></svg>
@@ -109,7 +123,7 @@ export class MealJournal extends LitElement {
         
         </div>
 
-        <div id="tableContainer" class="container" ?hidden="${this.insertMode}">
+         <div id="tableContainer" class="container" ?hidden="${this.insertMode}">
             <table id="table" class="table">
                 <thead>
                     <th>Data</th>
