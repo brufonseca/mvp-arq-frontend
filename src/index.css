@@ -15,6 +15,8 @@
   --md-sys-color-primary: rgb(77 92 146);
   --md-sys-color-surface-tint: rgb(77 92 146);
   --md-sys-color-on-primary: rgb(255 255 255);
+  --md-sys-color-on-surface: rgb(53 68 121);
+  --md-sys-color-surface-container-highest:rgb(77 92 146);
   --md-sys-color-primary-container: rgb(220 225 255);
   --md-sys-color-on-primary-container: rgb(53 68 121);
   --md-sys-color-secondary: rgb(89 93 114);
