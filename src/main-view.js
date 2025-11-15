@@ -15,10 +15,6 @@ export class MainView extends LitElement {
     ];
 
     static properties = {
-        selectedTab:{
-            type: String,
-            value: "journal"
-        }
 
     };
 
