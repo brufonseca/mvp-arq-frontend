@@ -15,6 +15,7 @@ export class MainView extends LitElement {
             #mainContainer{
                 height: 100vh;
                 width: 100vw;
+                overflow: hidden;
             }
 
             #tabs{

@@ -92,10 +92,12 @@ export class JournalForm extends LitElement {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                align-content: center;
-                justify-content: space-evenly;
+                place-content: center space-evenly;
                 gap: 8px;
                 margin-top: 12px;
+                height: calc(100% - 92px);
+                overflow-y: auto;
+                justify-content: flex-start;
             }
 
             md-outlined-text-field{
@@ -109,6 +111,7 @@ export class JournalForm extends LitElement {
                 --md-outlined-text-field-hover-input-text-color: var(--md-sys-color-primary);
                 --md-filled-text-field-input-text-font: "Roboto", sans-serif;
                 --md-filled-text-field-label-text-font: "Roboto", sans-serif;
+                width: 380px;
                 
             }
 
@@ -119,6 +122,7 @@ export class JournalForm extends LitElement {
                 align-items: center;
                 justify-content: flex-start;
                 gap: 24px;
+                width: 380px;
             }
 
             md-switch{
@@ -140,6 +144,23 @@ export class JournalForm extends LitElement {
             *[hidden]{
                 display: none !important;
             }
+
+            .primary-scroll{
+                scrollbar-color: var(--md-sys-color-primary-container) var(--md-sys-color-surface-tint);
+                scrollbar-width: thin;
+            }
+
+            .primary-scroll::-webkit-scrollbar {
+                width: 5px;
+            }
+
+            .primary-scroll::-webkit-scrollbar-thumb {
+                background: var(--md-sys-color-surface-tint); 
+            }
+
+            h4{
+                width: 380px;
+            }
         `
     ];
 
@@ -160,9 +181,15 @@ export class JournalForm extends LitElement {
                 @change=${this._computeItemsVisibility}></md-switch>
                 <div id="${mealType}Btns" class="action-btn-container" hidden>
 
-                    <!-- <md-filled-tonal-icon-button id="${mealType}HideShowBtn" @click=${this._toggleItem} meal="${mealType}">
-                    ${chevronUpSvg}
-                    </md-filled-tonal-icon-button> -->
+                    <md-filled-tonal-icon-button id="${mealType}HideBtn" @click=${this._toggleItem} meal="${mealType}">
+                        ${chevronUpSvg}
+                    </md-filled-tonal-icon-button> 
+
+                    <md-filled-tonal-icon-button id="${mealType}ShowBtn" @click=${this._toggleItem} meal="${mealType}" hidden>
+                        ${chevronDownSvg}
+                    </md-filled-tonal-icon-button> 
+
+
                     <md-filled-tonal-icon-button id="${mealType}ResetBtn" @click=${this._resetItem} meal="${mealType}">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>eraser</title><path d="M16.24,3.56L21.19,8.5C21.97,9.29 21.97,10.55 21.19,11.34L12,20.53C10.44,22.09 7.91,22.09 6.34,20.53L2.81,17C2.03,16.21 2.03,14.95 2.81,14.16L13.41,3.56C14.2,2.78 15.46,2.78 16.24,3.56M4.22,15.58L7.76,19.11C8.54,19.9 9.8,19.9 10.59,19.11L14.12,15.58L9.17,10.63L4.22,15.58Z" fill="#354479" /></svg>
                     </md-filled-tonal-icon-button>
@@ -171,7 +198,6 @@ export class JournalForm extends LitElement {
             </div>
 
             <form-meal-item id="${mealType}Item" meal="${mealType}" hidden></form-meal-item>
-            
             
             `;
 
@@ -196,16 +222,13 @@ export class JournalForm extends LitElement {
             </div>
             <div id="formContainer" class="form primary-scroll">
 
-                <div>
-                    <md-outlined-text-field id="entryDate" label="Data" value=""  type="date" required>
-                    </md-outlined-text-field>
-                </div>
+                <md-outlined-text-field id="entryDate" label="Data" value=""  type="date" required>
+                </md-outlined-text-field>
 
                 <h4 class="primary-color">Refeições Oferecidas</h4>
 
                 <div class="meals-container">
                     ${mealTemplates}
-
                 </div>
 
 
@@ -225,28 +248,75 @@ export class JournalForm extends LitElement {
             return;
         }
 
-        const mealItems = this.shadowRoot.querySelectorAll("form-meal-item");
-        console.log(mealItems)
+         let data = {};
+            data["date"] = entry_date;
 
-        for(const mealItem of mealItems){
 
-            // const mealData = mealItem.getData();
+        let mealIdx = {};
+        let hasMeal = false;
 
-        }
+
+        this.shadowRoot.querySelectorAll('md-switch')
+        .forEach(element => {
+            if (element.selected) {
+                hasMeal = true;
+
+                const mealType = element.getAttribute("name");
+                const mealTypeItem = this.shadowRoot.getElementById(`${mealType}Item`);
+
+                let meal = {
+                    'tipo': MEAL_TYPE[mealType],
+                    ...mealTypeItem.getData()
+                };
+
+                mealIdx[MEAL_TYPE[mealType]] = meal;
+            }
+
+        });
+
+         if (!hasMeal) {
+        alert("É preciso inserir uma refeição!");
+        return;
+    }
+
+    data["mealIdx"] = mealIdx
+
+    return data;
+
+
+
     }
 
     _resetForm(){
-        console.log("resetar!!")
+
+        const entryDateElement = this.shadowRoot.getElementById('entryDate');
+        entryDateElement.value = '';
+        entryDateElement.removeAttribute("disabled");
+
+        this.shadowRoot.querySelectorAll('md-switch').forEach(element => {
+            if(element.selected){
+                element.selected = false;
+                this.doToggleItemForMealElement(element.getAttribute("meal"));
+                this.doComputeItemsVisibility(element.getAttribute("meal"));
+
+                const mealTypeItem = this.shadowRoot.getElementById(`${element.getAttribute("meal")}Item`);
+                mealTypeItem?.resetData();
+                
+            }
+        });
+
+
     }
 
     _computeItemsVisibility(e){
-
-
         const mealType = e.target.getAttribute("meal");
+        this.doComputeItemsVisibility(mealType);
+    }
 
+    doComputeItemsVisibility(mealType){
         const mealTypeSwitch = this.shadowRoot.getElementById(`${mealType}Switch`);
 
-        const mealTypeItem = this.shadowRoot.getElementById(`${mealType}Item`);
+       const mealTypeItem = this.shadowRoot.getElementById(`${mealType}Item`);
         const mealTypeBtns = this.shadowRoot.getElementById(`${mealType}Btns`);
 
 
@@ -254,38 +324,59 @@ export class JournalForm extends LitElement {
             mealTypeItem.removeAttribute("hidden");
             mealTypeBtns.removeAttribute("hidden");
        } else{
-            mealTypeItem.setAttribute("hidden", null);
+           mealTypeItem.setAttribute("hidden", null);
             mealTypeBtns.setAttribute("hidden", null);
        }
-
     }
 
     _resetItem(e){
         const mealType = e.target.getAttribute("meal");
         console.log(`reset ${mealType}`)
+
+        const mealTypeItem = this.shadowRoot.getElementById(`${mealType}Item`);
+        mealTypeItem?.resetData();
+    }
+
+    setFormData(){
+
+        this.shadowRoot.getElementById('entryDate')?.value = entryData.date;
+
+        for (const meal of Object.keys(entryData.mealIdx)) {
+
+            const mealData = entryData.mealIdx[meal];
+            let mealType = TIPO_REFEICAO[meal]
+
+            this.doToggleItemForMealElement(mealType);
+            this.doComputeItemsVisibility(mealType);
+
+           const mealTypeSwitch = this.shadowRoot.getElementById(`${mealType}Switch`);
+            mealTypeSwitch.selected = true;
+
+
+            const mealTypeItem = this.shadowRoot.getElementById(`${mealType}Item`);
+            mealTypeItem.setData(mealData);
+
+        }
+
     }
 
     _toggleItem(e){
-
         const mealType = e.target.getAttribute("meal");
+        this.doToggleItemForMealElement(mealType);
+    }
 
-        const hideShowBtn = this.shadowRoot.getElementById(`${mealType}HideShowBtn`);
+    doToggleItemForMealElement(mealType){
+
+        const hideBtn = this.shadowRoot.getElementById(`${mealType}HideBtn`);
+        const showBtn = this.shadowRoot.getElementById(`${mealType}ShowBtn`);
         const mealTypeItem = this.shadowRoot.getElementById(`${mealType}Item`);
 
+        hideBtn?.toggleAttribute("hidden");
+        showBtn?.toggleAttribute("hidden");
         mealTypeItem?.toggleAttribute("hidden");
-        const newIcon = hideShowBtn.innerHTML.includes('chevron-up') ? chevronDownSvg : chevronUpSvg;
-
-
-        const currentIconElement = hideShowBtn.querySelector('svg');
-
-
-        console.log(hideShowBtn)
-
-         hideShowBtn.removeChild(currentIconElement);
-
-        //  const ele = document.createElement(newIcon)
-          hideShowBtn.innerHTML = newIcon;
 
     }
+
+
 }
 customElements.define('journal-form', JournalForm);

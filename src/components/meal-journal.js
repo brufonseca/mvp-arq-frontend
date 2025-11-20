@@ -88,6 +88,11 @@ export class MealJournal extends LitElement {
                 text-align: center;
             }
 
+            #form{
+                height: 100%;
+                width: 100%;
+            }
+
             
         `
     ];
@@ -138,7 +143,7 @@ export class MealJournal extends LitElement {
         </div>
 
         <div id="formContainer" ?hidden="${!this.insertMode}">
-            <journal-form></journal-form>
+            <journal-form id="form"></journal-form>
         </div>
         
         
