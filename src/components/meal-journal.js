@@ -1,6 +1,8 @@
-import { LitElement, html, css } from 'lit';
+import { LitElement, html, css } from "lit";
 
-import "@material/web/button/filled-tonal-button.js"
+import "@material/web/button/filled-tonal-button.js";
+import "@material/web/iconbutton/outlined-icon-button.js";
+import "@material/web/button/text-button.js";
 
 import "./journal-form.js";
 
@@ -51,107 +53,276 @@ export class MealJournal extends LitElement {
                 align-items: center;
             }
 
-            #btnContainer{
+            #btnContainer {
                 margin: 10px 10px;
                 height: 48px;
                 width: calc(100% - 20px);
             }
 
-            #tableContainer{
+            #tableContainer {
                 height: calc(100% - 68px - 140px);
                 width: 100%;
             }
 
-            #formContainer{
+            #formContainer {
                 height: calc(100% - 140px);
                 width: 100%;
             }
 
-
             thead th {
                 width: 20%;
-                color:var(--md-sys-color-on-primary-container);
-
+                color: var(--md-sys-color-on-primary-container);
             }
 
-            thead th:nth-child(n+6) {
+            thead th:nth-child(n + 6) {
                 width: 15%;
             }
 
             th,
             td {
                 padding: 5px;
-                color: var(--app-dark-primary-color)
+                color: var(--app-dark-primary-color);
             }
 
             td {
                 text-align: center;
             }
 
-            #form{
+            #form {
                 height: 100%;
                 width: 100%;
             }
 
-            
-        `
+            md-outlined-icon-button {
+                --md-outlined-icon-button-outline-color: var(----md-sys-color-on-primary);
+            }
+        `,
     ];
 
     static properties = {
-        insertMode:{
+        insertMode: {
             type: Boolean,
-            value: false
-        }
-
+            value: false,
+        },
+        mode: {
+            type: String,
+        },
     };
 
-    constructor(){
+    constructor() {
         super();
         this.insertMode = false;
+        this.mode = "INSERT";
+    }
+
+    connectedCallback() {
+        super.connectedCallback();
+
+        this.getEntriesList();
+
+        this.addEventListener("show-table", () => {
+            this.insertMode = false;
+        });
     }
 
     render() {
         return html`
-        
-         <header>
-            <div class="header-bar"></div>
-            <div class="title">
-                <h2>Diário de Introdução Alimentar</h2>
+            <header>
+                <div class="header-bar"></div>
+                <div class="title">
+                    <h2>Diário de Introdução Alimentar</h2>
+                </div>
+            </header>
+
+            <div id="btnContainer" class="left-container" ?hidden="${this.insertMode}">
+                <md-filled-tonal-button @click=${this._showForm}>
+                    Adicionar Registro
+                    <svg slot="icon" viewBox="0 0 24 24"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" /></svg>
+                </md-filled-tonal-button>
             </div>
-        </header>
 
-        <div id="btnContainer" class="left-container" ?hidden="${this.insertMode}">
-            <md-filled-tonal-button @click=${this._showForm}>
-                Adicionar Registro
-                <svg slot="icon" viewBox="0 0 24 24"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/></svg>
-            </md-filled-tonal-button>
-        
-        </div>
+            <div id="tableContainer" class="container" ?hidden="${this.insertMode}">
+                <table id="table" class="table">
+                    <thead>
+                        <th>Data</th>
+                        <th>Lanche Manhã</th>
+                        <th>Almoço</th>
+                        <th>Lanche Tarde</th>
+                        <th>Jantar</th>
+                        <th></th>
+                        <th></th>
+                    </thead>
+                </table>
+            </div>
 
-         <div id="tableContainer" class="container" ?hidden="${this.insertMode}">
-            <table id="table" class="table">
-                <thead>
-                    <th>Data</th>
-                    <th>Lanche Manhã</th>
-                    <th>Almoço</th>
-                    <th>Lanche Tarde</th>
-                    <th>Jantar</th>
-                    <th></th>
-                    <th></th>
-                </thead>
-            </table>
-        </div>
-
-        <div id="formContainer" ?hidden="${!this.insertMode}">
-            <journal-form id="form"></journal-form>
-        </div>
-        
-        
+            <div id="formContainer" ?hidden="${!this.insertMode}">
+                <journal-form id="form"></journal-form>
+            </div>
         `;
     }
 
-    _showForm(){
-       this.insertMode = true;
+    _showForm() {
+        this.insertMode = true;
+    }
+
+    getEntriesList() {
+        let url = "http://127.0.0.1:5000/listar_diarios";
+        fetch(url, {
+            method: "get",
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                data["diarios"].forEach((entry) => {
+                    let entryData = {};
+                    let date = new Date(entry.data_registro);
+                    date = date.toISOString();
+                    date = date.toString().substring(0, 10);
+
+                    entryData.date = date;
+                    entryData.mealIdx = entry.refeicoes.reduce((acc, item) => {
+                        acc[item.tipo] = item;
+                        return acc;
+                    }, {});
+
+                    this.addEntryToList(entryData);
+                });
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+            });
+    }
+
+    addEntryToList(entryData) {
+        const meals = ["LANCHE_MANHA", "ALMOCO", "LANCHE_TARDE", "JANTAR"];
+        const mealIdx = entryData["mealIdx"];
+        const date = entryData["date"];
+
+        const table = this.shadowRoot.getElementById("table");
+
+        if (this.mode === "EDIT") {
+            const row = this.shadowRoot.getElementById(`${date}_Row`);
+            if (row) {
+                row.remove();
+            }
+        }
+
+        const row = table.insertRow();
+        row.id = `${date}_Row`;
+        this.insertRemoveButton(row.insertCell(-1), date);
+        this.insertEditButton(row.insertCell(-1), date);
+
+        let cell = row.insertCell(0);
+        cell.textContent = date;
+
+        for (let i = 1; i <= meals.length; i++) {
+            let cell = row.insertCell(i);
+            if (mealIdx[meals[i - 1]] !== undefined) {
+                cell.textContent = "OK";
+            } else {
+                cell.textContent = "-";
+            }
+        }
+    }
+
+    createSVGElement(path) {
+        const svgNamespace = "http://www.w3.org/2000/svg";
+
+        const svg = document.createElementNS(svgNamespace, "svg");
+        svg.setAttribute("viewBox", "0 0 24 24");
+
+        const pathElement = document.createElementNS(svgNamespace, "path");
+        pathElement.setAttribute("d", path);
+
+        svg.appendChild(pathElement);
+
+        return svg;
+    }
+
+    insertRemoveButton(parent, date) {
+        const removeBtn = document.createElement("md-outlined-icon-button");
+        removeBtn.setAttribute("date", date);
+        const svg = this.createSVGElement("M9,3V4H4V6H5V19A2,2 0 0,0 7,21H17A2,2 0 0,0 19,19V6H20V4H15V3H9M7,6H17V19H7V6M9,8V17H11V8H9M13,8V17H15V8H13Z");
+
+        removeBtn.appendChild(svg);
+        parent.appendChild(removeBtn);
+
+        removeBtn.onclick = () => this.removeEntryFromList(date);
+    }
+
+    insertEditButton(parent, date) {
+        const editBtn = document.createElement("md-outlined-icon-button");
+        editBtn.setAttribute("date", date);
+
+        const svg = this.createSVGElement(
+            "M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"
+        );
+
+        editBtn.appendChild(svg);
+        parent.appendChild(editBtn);
+
+        editBtn.onclick = () => this.editEntryFromList(date);
+    }
+
+    removeEntryFromList(entryDate) {
+        const row = this.shadowRoot.getElementById(`${entryDate}_Row`);
+
+        if (!row) {
+            return;
+        }
+
+        if (confirm("Deseja remover o registro?")) {
+            row.remove();
+            this.removeEntry(entryDate);
+        }
+    }
+
+    editEntryFromList(entryDate) {
+        const url = `http://127.0.0.1:5000/buscar_diario?data_registro=${entryDate}`;
+        fetch(url, {
+            method: "get",
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                let entryData = {};
+                let date = new Date(data.data_registro);
+                date = date.toISOString();
+                date = date.toString().substring(0, 10);
+                entryData.date = date;
+
+                entryData.date = date;
+                entryData.mealIdx = data.refeicoes.reduce((acc, item) => {
+                    acc[item.tipo] = item;
+                    return acc;
+                }, {});
+
+                this.mode = "EDIT";
+
+                this._showForm();
+                this.setFormData(entryData);
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+            });
+    }
+
+    removeEntry(entryDate) {
+        let url = `http://127.0.0.1:5000/deletar_diario?data_registro=${entryDate}`;
+        fetch(url, {
+            method: "delete",
+        })
+            .then((response) => response.json())
+            .catch((error) => {
+                console.error("Error:", error);
+            });
+    }
+
+    setFormData(entryData) {
+        const formElement = this.shadowRoot.getElementById("form");
+
+        if (formElement) {
+            formElement.setFormData(entryData);
+            formElement.setFormMode(this.mode);
+        }
     }
 }
-customElements.define('meal-journal', MealJournal);
+customElements.define("meal-journal", MealJournal);
