@@ -104,14 +104,17 @@ export class FormMealItem extends LitElement {
 
             <h4>Comentários</h4>
 
-            <md-outlined-text-field id="comments" value="" type="textarea" rows="5" cols="60"> </md-outlined-text-field>
+            <md-outlined-text-field id="comments" value="" type="textarea" rows="5" cols="60" name="comentarios"> </md-outlined-text-field>
         `;
     }
 
     getData() {
         let data = {};
 
-        const radioElements = this.shadowRoot.querySelectorAll("md-radio").filter((element) => element.checked);
+        const radioElements = this.shadowRoot.querySelectorAll("md-radio");
+        let radioElemensList = [...radioElements];
+        radioElemensList = radioElemensList.filter((element) => element.checked);
+        
         const commentsElement = this.shadowRoot.querySelectorAll("md-outlined-text-field");
 
         const elements = [...radioElements, ...commentsElement];
@@ -127,14 +130,18 @@ export class FormMealItem extends LitElement {
         for (const attr of Object.keys(data)) {
             const value = data[attr];
 
+
+            if (attr === "comentarios") {
+                const textElement = this.shadowRoot.querySelector(`md-outlined-text-field`);
+                if (textElement !== null) {
+                    textElement.value = value;
+                }
+
+                continue;
+            }
             const element = this.shadowRoot.querySelector(`md-radio[name=${attr}][value=${value}]`);
             if (element !== null) {
                 element.checked = true;
-            }
-
-            let textElement = this.shadowRoot.querySelector(`md-outlined-text-field`);
-            if (textElement !== null) {
-                textElement.value = value;
             }
         }
     }
