@@ -42,14 +42,10 @@ export class MainView extends LitElement {
         return html`
         <div id="mainContainer">
             <md-tabs id="tabs" @change=${this._handleTabChange}>
-                <md-primary-tab tab="summary">Resumo</md-primary-tab>
                 <md-primary-tab tab="journal" active>Diário</md-primary-tab>
                 <md-primary-tab tab="recipes">Receitas</md-primary-tab>
             </md-tabs>
             <div id="viewStack">
-                <div id="summaryTab" class="tab" hidden>
-                    <h1>Resumo</h1>
-                </div>
                 <div id="journalTab" class="tab">
                     <meal-journal></meal-journal>
                 </div>
@@ -57,7 +53,6 @@ export class MainView extends LitElement {
                     <h1>Receitas</h1>
                 </div>
                 <!-- 
-                <meal-dashboard></meal-dashboard>
                 <recipes-list></recipes-list> -->
 
             </div>
