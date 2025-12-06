@@ -68,7 +68,7 @@ export class JournalForm extends LitElement {
             }
 
             .spacer {
-                width: 92px;
+                width: 74px;
             }
 
             .center-text {
@@ -216,7 +216,7 @@ export class JournalForm extends LitElement {
                 <span class="spacer"></span>
                 <h3>Novo Registro</h3>
                 <div class="left-container">
-                    <md-filled-icon-button @click=${this._saveData}>
+                    <md-filled-icon-button @click=${this._commitOperation}>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                             <title>content-save</title>
                             <path
@@ -235,7 +235,7 @@ export class JournalForm extends LitElement {
                 </div>
             </div>
             <div id="formContainer" class="form primary-scroll">
-                <md-outlined-text-field id="entryDate" label="Data" value="" type="date" required> </md-outlined-text-field>
+                <md-outlined-text-field id="entryDate" value="" type="date" required placeholder="Data"> </md-outlined-text-field>
 
                 <h4 class="primary-color">Refeições Oferecidas</h4>
 
@@ -244,7 +244,30 @@ export class JournalForm extends LitElement {
         `;
     }
 
-    _saveData(e) {
+    _commitOperation(e){
+
+        const data = this._processEntry();
+
+        if(data === undefined){
+            return;
+        }
+
+
+        this.dispatchEvent(
+            new CustomEvent("add-entry-to-list", {
+                bubbles: true,
+                composed: true,
+                detail: { data: data}
+            })
+        );
+
+        this.postEntry(data);
+        this._resetForm();
+
+        
+    }
+
+    _processEntry() {
         const dateInput = this.shadowRoot.getElementById("entryDate");
         const dateValue = dateInput?.value;
 
@@ -289,7 +312,7 @@ export class JournalForm extends LitElement {
         data["mealIdx"] = mealIdx;
 
 
-        this.postEntry(data);
+       return data;
     }
 
     _resetForm() {
@@ -338,7 +361,6 @@ export class JournalForm extends LitElement {
 
     _resetItem(e) {
         const mealType = e.target.getAttribute("meal");
-        console.log(`reset ${mealType}`);
 
         const mealTypeItem = this.shadowRoot.getElementById(`${mealType}Item`);
         mealTypeItem?.resetData();
@@ -398,6 +420,8 @@ export class JournalForm extends LitElement {
         if (this.mode === "EDIT") {
             url = "http://127.0.0.1:5000/editar_diario";
         }
+
+        console.log(this.mode)
 
 
         fetch(url, {

@@ -123,6 +123,10 @@ export class MealJournal extends LitElement {
         this.addEventListener("show-table", () => {
             this.insertMode = false;
         });
+
+        this.addEventListener("add-entry-to-list", (e) => {
+            this.addEntryToList(e.detail.data);
+        })
     }
 
     render() {
