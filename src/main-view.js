@@ -4,12 +4,18 @@ import "@material/web/tabs/tabs.js"
 import "@material/web/tabs/primary-tab.js"
 
 import "./components/meal-journal.js";
+import "./components/recipe-finder.js";
 
 export class MainView extends LitElement {
     static styles = [
         css`
+
+            :root{
+                --md-primary-tab-label-text-font: "Roboto", sans-serif;
+            }
             :host {
                 display: block;
+                font-family: "Roboto", sans-serif;
             }
 
             #mainContainer{
@@ -31,6 +37,7 @@ export class MainView extends LitElement {
             .tab{
                 height: 100%;
             }
+
         `,
     ];
 
@@ -50,10 +57,8 @@ export class MainView extends LitElement {
                     <meal-journal></meal-journal>
                 </div>
                 <div id="recipesTab" class="tab" hidden>
-                    <h1>Receitas</h1>
+                    <recipe-finder></recipe-finder>
                 </div>
-                <!-- 
-                <recipes-list></recipes-list> -->
 
             </div>
         </div>
