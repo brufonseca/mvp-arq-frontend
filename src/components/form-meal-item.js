@@ -3,12 +3,6 @@ import { LitElement, html, css } from "lit";
 import "@material/web/radio/radio.js";
 import "@material/web/textfield/outlined-text-field.js";
 
-const MEAL_TYPE = {
-    morningSnack: "LANCHE_MANHA",
-    lunch: "ALMOCO",
-    afternoonSnack: "LANCHE_TARDE",
-    dinner: "JANTAR",
-};
 
 const MEAL_METHOD = [
     { type: "BLW", label: "BLW" },
