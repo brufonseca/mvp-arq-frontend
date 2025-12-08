@@ -1,7 +1,9 @@
 import { LitElement, html, css } from "lit";
 
 import "@material/web/iconbutton/filled-tonal-icon-button.js";
+import "@material/web/textfield/outlined-text-field.js";
 import "@material/web/checkbox/checkbox.js";
+import "@material/web/radio/radio.js";
 
 export class RecipeFinder extends LitElement {
     static styles = [
@@ -32,7 +34,7 @@ export class RecipeFinder extends LitElement {
                 justify-content: center;
             }
 
-            .container{
+            .container {
                 display: flex;
                 flex-direction: column;
                 align-content: center;
@@ -44,11 +46,11 @@ export class RecipeFinder extends LitElement {
                 text-align: center;
             }
 
-            .spacer{
+            .spacer {
                 width: 92px;
             }
 
-            .form-title{
+            .form-title {
                 background-color: var(--app-accent);
                 color: var(--app-text);
                 display: flex;
@@ -66,6 +68,60 @@ export class RecipeFinder extends LitElement {
                 align-items: center;
                 padding: 0 12px;
             }
+
+            md-outlined-text-field {
+                --md-outlined-text-field-label-text-color: var(--md-sys-color-primary);
+                --md-outlined-text-field-input-text-color: var(--md-sys-color-primary);
+                --md-outlined-field-content-font: var(--md-sys-color-primary);
+                --md-outlined-field-focus-content-color: var(--md-sys-color-primary);
+                --md-outlined-field-hover-content-color: var(--md-sys-color-primary);
+                --md-outlined-field-hover-label-text-color: var(--md-sys-color-primary);
+                --md-outlined-field-hover-outline-color: var(--md-sys-color-primary);
+                --md-outlined-text-field-hover-input-text-color: var(--md-sys-color-primary);
+                --md-filled-text-field-input-text-font: "Roboto", sans-serif;
+                --md-filled-text-field-label-text-font: "Roboto", sans-serif;
+                width: 380px;
+            }
+
+            .form-container {
+                height: 100%;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .display-horizontal {
+                display: flex;
+                flex-direction: row;
+                align-content: center;
+                align-items: center;
+                gap: 12px;
+            }
+            
+            #recipesContainer{
+                overflow-y: auto;
+                height: calc(100vh - 188px);
+            }
+
+            .primary-scroll {
+                scrollbar-color: var(--md-sys-color-primary-container) var(--md-sys-color-surface-tint);
+                scrollbar-width: thin;
+            }
+
+            .primary-scroll::-webkit-scrollbar {
+                width: 5px;
+            }
+
+            .primary-scroll::-webkit-scrollbar-thumb {
+                background: var(--md-sys-color-surface-tint);
+            }
+
+            .instructions-container{
+                width: 80%;
+                margin-bottom: 20px;
+            }
         `,
     ];
 
@@ -78,9 +134,9 @@ export class RecipeFinder extends LitElement {
                 </div>
             </header>
 
-            <div id="recipesContainer">
-                <div id="recipeFormContainer" >
-                    <div class="form-title center-text" >
+            <div id="recipesContainer" class="primary-scroll">
+                <div id="recipeFormContainer">
+                    <div class="form-title center-text">
                         <span class="spacer"></span>
                         <!-- <h3>Buscar Receitas</h3> -->
                         <div class="left-container">
@@ -97,22 +153,137 @@ export class RecipeFinder extends LitElement {
                     </div>
                     <div class="form-container recipe-form">
                         <h4>Restrições</h4>
-                        <div>
+                        <div class="display-horizontal">
                             <label>
                                 <md-checkbox value="sal" name="restrictions"></md-checkbox>
                                 Sal
                             </label>
+
+                            <label>
+                                <md-checkbox value="açúcar" name="restrictions"></md-checkbox>
+                                Açúcar
+                            </label>
+
+                            <label>
+                                <md-checkbox value="leite" name="restrictions"></md-checkbox>
+                                Leite
+                            </label>
+
+                            <label>
+                                <md-checkbox value="ovo" name="restrictions"></md-checkbox>
+                                Ovo
+                            </label>
+                        </div>
+                        <h4>Tipo</h4>
+                        <div class="display-horizontal">
+                            <label>
+                                <md-radio name="dishType" value="main course"></md-radio>
+                                Principal
+                            </label>
+                            <label>
+                                <md-radio name="dishType" value="side dish"></md-radio>
+                                Acompanhamento
+                            </label>
+                            <label>
+                                <md-radio name="dishType" value="breakfast"></md-radio>
+                                Café da manhã
+                            </label>
+                            <label>
+                                <md-radio name="dishType" value="dessert"></md-radio>
+                                Sobremesa
+                            </label>
+                            <label>
+                                <md-radio name="dishType" value="snack"></md-radio>
+                                Lanche
+                            </label>
+                        </div>
+                        <h4>Ingredientes</h4>
+                        <md-outlined-text-field id="ingredients" value="" type="textarea" rows="5" cols="60" name="Ingredientes"> </md-outlined-text-field>
+
+                        <div id="btnContainer">
+                            <md-filled-tonal-button @click=${this.requestRecipe}> Buscar </md-filled-tonal-button>
                         </div>
                     </div>
                 </div>
 
                 <div id="suggestedRecipeContainer" hidden class="container">
                     <h3>Receita</h3>
-                    <div id="suggestedRecipe" class="container"  ></div>
+                    <div id="suggestedRecipe" class="container"></div>
                 </div>
-
             </div>
         `;
+    }
+
+    requestRecipe() {
+        const checkboxElements = this.shadowRoot.querySelectorAll("md-checkbox");
+        let checkboxElemensList = [...checkboxElements];
+
+        const excludeIngredientsList = [];
+
+        checkboxElemensList.forEach((element) => {
+            if (element.checked) excludeIngredientsList.push(element.getAttribute("value"));
+        });
+
+        const radioElements = this.shadowRoot.querySelectorAll("md-radio");
+        let radioElemensList = [...radioElements];
+
+        let dishType = "";
+
+        radioElemensList.forEach((element) => {
+            if (element.checked) dishType = element.getAttribute("value");
+        });
+
+        const excludeIngredients = excludeIngredientsList.join(",");
+        const ingredients = this.shadowRoot.querySelector(`md-outlined-text-field`)?.value;
+
+        if (!ingredients) {
+            alert("Você deve fornecer a lista de ingredientes");
+            return;
+        }
+
+        if (!dishType) {
+            dishType = "breakfast";
+        }
+
+        const url = `http://127.0.0.1:5000/buscar_receita?excludeIngredients=${excludeIngredients}&ingredients=${ingredients}&dishType=${dishType}`;
+
+        fetch(url, {
+            method: "get",
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                console.debug(data);
+
+                if (data.message === "Não foi possível realizar a requisição :/") {
+                    alert("Não foi possível encontrar receitas");
+                    return;
+                }
+
+                const suggestedRecipeContainer = this.shadowRoot.getElementById("suggestedRecipeContainer");
+                suggestedRecipeContainer.removeAttribute("hidden");
+
+                const suggestedRecipe = this.shadowRoot.getElementById("suggestedRecipe");
+                suggestedRecipe.removeAttribute("hidden");
+
+                let recipeContent = ``;
+
+                const recipe = data;
+
+                recipeContent += `<h4>${recipe.titulo}</h4><br>`;
+                recipeContent += `<h5>Ingredientes</h5><br>`;
+                recipeContent += `<ul>`;
+                recipe.ingredientes.map((ingrediente) => {
+                    if (ingrediente !== "") recipeContent += `<li>${ingrediente}</li>`;
+                });
+                recipeContent += `</ul>`;
+
+                recipeContent += `<h5>Preparo</h5><div class="instructions-container">${recipe.instrucoes}</div>`;
+
+                this.shadowRoot.getElementById("suggestedRecipe").innerHTML = recipeContent;
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+            });
     }
 }
 customElements.define("recipe-finder", RecipeFinder);
