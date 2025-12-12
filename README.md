@@ -1,17 +1,35 @@
 # 🚀 MVP Arquitetura de Software – Frontend
 
 Bem-vinda(o) ao repositório do **MVP Arquitetura de Software – Frontend**!  
-Este projeto tem como objetivo implementar a interface de um *Diário de Introdução Alimentar e Buscador de Receitas*
+Este projeto tem como objetivo implementar a interface de um *Diário de Introdução Alimentar e Buscador de Receitas*.
+
+Ele se comunica com o backend Flask através de REST, com toda a aplicação rodando em containers independentes via Docker.
+
+> **Cenário implementado: Cenário 1.1**
 
 ---
+## 📊 Fluxograma
 
+<img width="800" height="382" alt="image" src="https://github.com/user-attachments/assets/e20f2030-9094-47c0-9a11-b66c44dee8ad" />
+
+
+---
 ## ✨ Tecnologias Utilizadas
 
-### 🔹 Lit (Web Components)
-### 🔹 Vite ⚡
-### 🔹 pnpm 📦
+### 🔹 Lit (Web Components)  
+https://lit.dev/
+
+### 🔹 Vite ⚡  
+https://vitejs.dev/
+
+### 🔹 pnpm 📦  
+https://pnpm.io/
+
 ### 🔹 Material Web Components 🎨  
-### 🔹 Docker 🐳 
+https://material-web.dev/
+
+### 🔹 Docker 🐳  
+https://docs.docker.com/
 
 ---
 
@@ -21,13 +39,20 @@ Antes de rodar o projeto, certifique-se de ter instalado:
 
 - **Node.js** (v18+ recomendado) → https://nodejs.org/  
 - **pnpm** (gerenciador de pacotes) → https://pnpm.io/  
-- **Docker** (para rodar o projeto em containers) → https://docs.docker.com/  
+- **Docker** (para rodar o projeto em containers) → https://docs.docker.com/
+- **Docker Compose** (geralmente incluso no Docker Desktop)
 
 ---
 
 ## 🧱 Arquitetura do Projeto
 
-O frontend é baseado em Web Components usando **Lit**, com **Vite** como ferramenta de build e dev server.  
+O frontend utiliza:
+
+- **Lit** para criação de Web Components reativos  
+- **Vite** para desenvolvimento, build e hot-reload  
+- **Material Web Components** para UI consistente  
+- **pnpm** como gerenciador de pacotes  
+- **Docker/Docker Compose** para ambiente padronizado.  
 
 
 ### 🔗 Comunicação com o Backend (REST API)
@@ -37,26 +62,70 @@ O frontend conversa com o backend Flask por meio de endpoints organizados, rodan
 
 ---
 
-## ▶️ Como Rodar o Projeto em modo de Desenvolvimento
+## ▶️ Como Rodar o Projeto 
 
-1. **Clonar o repositório**:
+
+### 🔹 Clonar o repositório
    ```bash
    git clone https://github.com/brufonseca/mvp-arq-frontend.git
    cd mvp-arq-frontend
    ```
 
-2. **Executar na raiz do repositório**
+
+### 💻 Execução em Modo de Desenvolvimento
+
+
+Na raiz do repositório:
    ```bash
    pnpm install
    pnpm dev
    ```
 
-Para a acessar o frontend, abrir o navegador de sua escolha e digitar http://localhost:5173
+Acesse no navegador:
+👉 http://localhost:5173
 
 
-## 🐳 Rodando com Docker
+### 🐳 Docker
 
-**Os comandos a seguir devem sr executados na raiz do repositório**
+### 🔹 Rodando apenas o Frontend com Docker
+
+`Ideal quando o backend já está rodando separadamente.`
+
+**Os comandos a seguir devem ser executados na raiz do repositório e com privilégios de administrador ou usuário pertencente ao grupo docker**
+
+Construção da imagem Docker
+   ```bash
+   docker build -t mvp-arq-frontend .  
+   ```
+
+Execução do container
+   ```bash
+   docker run -p 5173:80 mvp-arq-frontend
+   ```
+
+Acesse no navegador:
+👉 http://localhost:80/
+
+
+### 🐳 Docker Compose (Frontend + Backend)
+
+Este projeto inclui um arquivo **docker-compose.yml** na raiz do projeto, responsável por subir **tanto o frontend quanto o backend** juntos.  
+Isso facilita o desenvolvimento e garante que os dois serviços conversem corretamente dentro da mesma rede Docker.
+
+**Os comandos a seguir devem ser executados na raiz do repositório e com privilégios de administrador ou usuário pertencente ao grupo docker**
+
+Executar toda a stack
+```bash
+docker compose up --build
+```
+
+Após subir:
+
+Frontend → http://localhost/
+
+Backend Flask → http://localhost:5000 (porta definida no docker-compose.yml) 
+
+
 
   
 
