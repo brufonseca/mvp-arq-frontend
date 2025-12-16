@@ -415,17 +415,20 @@ export class JournalForm extends LitElement {
             refeicoes: Object.values(entry["mealIdx"]),
         };
 
+
+        let method =  "post";
+
         let url = "http://127.0.0.1:5000/inserir_diario";
 
         if (this.mode === "EDIT") {
             url = "http://127.0.0.1:5000/editar_diario";
+            method =  "put";
         }
 
-        console.log(this.mode)
 
 
         fetch(url, {
-            method: "post",
+            method: method,
             body: JSON.stringify(data),
             headers: { "Content-type": "application/json; charset=UTF-8" },
         })
