@@ -285,5 +285,23 @@ export class RecipeFinder extends LitElement {
                 console.error("Error:", error);
             });
     }
+
+    _resetForm(){
+
+        const radioElements = this.shadowRoot.querySelectorAll("md-radio");
+        const checkboxElements = this.shadowRoot.querySelectorAll("md-checkbox");
+        const textElement = this.shadowRoot.getElementById("ingredients");
+
+        for (let element of radioElements) {
+            element.checked = false;
+        }
+
+        for (let element of checkboxElements) {
+            element.checked = false;
+        }
+
+        textElement.value = "";
+        
+    }
 }
 customElements.define("recipe-finder", RecipeFinder);
