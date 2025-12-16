@@ -5,10 +5,12 @@ Este projeto tem como objetivo implementar a interface de um *Diário de Introdu
 
 Ele se comunica com o backend Flask através de REST, com toda a aplicação rodando em containers independentes via Docker.
 
-> **Cenário implementado: Cenário 1.1**
+
 
 ---
 ## 📊 Fluxograma
+
+> **Cenário implementado: Cenário 1.1**
 
 <img width="800" height="382" alt="image" src="https://github.com/user-attachments/assets/e20f2030-9094-47c0-9a11-b66c44dee8ad" />
 
@@ -45,15 +47,6 @@ Antes de rodar o projeto, certifique-se de ter instalado:
 ---
 
 ## 🧱 Arquitetura do Projeto
-
-O frontend utiliza:
-
-- **Lit** para criação de Web Components reativos  
-- **Vite** para desenvolvimento, build e hot-reload  
-- **Material Web Components** para UI consistente  
-- **pnpm** como gerenciador de pacotes  
-- **Docker/Docker Compose** para ambiente padronizado.  
-
 
 ### 🔗 Comunicação com o Backend (REST API)
 
