@@ -93,11 +93,11 @@ Construção da imagem Docker
 
 Execução do container
    ```bash
-   docker run -p 5173:80 mvp-arq-frontend
+   docker run -p 5173:8080 mvp-arq-frontend
    ```
 
 Acesse no navegador:
-👉 http://localhost:80/
+👉 http://localhost:8080/
 
 
 ### 🐳 Docker Compose (Frontend + Backend)
@@ -114,7 +114,7 @@ docker compose up --build
 
 Após subir:
 
-Frontend → http://localhost/
+Frontend → http://localhost:8080
 
 Backend Flask → http://localhost:5000 (porta definida no docker-compose.yml) 
 
