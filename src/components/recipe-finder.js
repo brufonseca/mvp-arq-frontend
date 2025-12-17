@@ -122,6 +122,12 @@ export class RecipeFinder extends LitElement {
                 width: 80%;
                 margin-bottom: 20px;
             }
+
+            .warning{
+                font-style: italic;
+                font-size: 12px;
+                margin-bottom: 10px;
+            }
         `,
     ];
 
@@ -138,7 +144,7 @@ export class RecipeFinder extends LitElement {
                 <div id="recipeFormContainer">
                     <div class="form-title center-text">
                         <span class="spacer"></span>
-                        <!-- <h3>Buscar Receitas</h3> -->
+                        <!-- <h3>Buscar Receitas</h3> 
                         <div class="left-container">
                             <md-filled-icon-button @click=${this._resetForm}>
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -149,7 +155,7 @@ export class RecipeFinder extends LitElement {
                                     />
                                 </svg>
                             </md-filled-icon-button>
-                        </div>
+                        </div>-->
                     </div>
                     <div class="form-container recipe-form">
                         <h4>Restrições</h4>
@@ -199,9 +205,11 @@ export class RecipeFinder extends LitElement {
                         </div>
                         <h4>Ingredientes</h4>
                         <md-outlined-text-field id="ingredients" value="" type="textarea" rows="5" cols="60" name="Ingredientes"> </md-outlined-text-field>
+                        <span class="warning">Importante: informar os ingredientes separados por vírgula</span>
 
                         <div id="btnContainer">
                             <md-filled-tonal-button @click=${this.requestRecipe}> Buscar </md-filled-tonal-button>
+                            <md-filled-tonal-button @click=${this._resetForm}> Cancelar </md-filled-tonal-button>
                         </div>
                     </div>
                 </div>
@@ -255,6 +263,7 @@ export class RecipeFinder extends LitElement {
                 console.debug(data);
 
                 if (data.message === "Não foi possível realizar a requisição :/") {
+                    this.shadowRoot.getElementById("suggestedRecipe").innerHTML = "";
                     alert("Não foi possível encontrar receitas");
                     return;
                 }
