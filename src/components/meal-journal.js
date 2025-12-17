@@ -126,7 +126,7 @@ export class MealJournal extends LitElement {
 
         this.addEventListener("add-entry-to-list", (e) => {
             this.addEntryToList(e.detail.data);
-        })
+        });
     }
 
     render() {
@@ -176,7 +176,13 @@ export class MealJournal extends LitElement {
         })
             .then((response) => response.json())
             .then((data) => {
-                data["diarios"].forEach((entry) => {
+                const entries = data["diarios"].sort((entryA, entryB) => {
+                    const dateA = new Date(entryA.data_registro);
+                    const dateB = new Date(entryB.data_registro);
+                    return  dateB - dateA ;
+                });
+
+                entries.forEach((entry) => {
                     let entryData = {};
                     let date = new Date(entry.data_registro);
                     date = date.toISOString();
