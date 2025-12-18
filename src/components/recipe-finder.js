@@ -139,25 +139,16 @@ export class RecipeFinder extends LitElement {
                     <h2>Buscar Receitas</h2>
                 </div>
             </header>
-
+            <!-- Container rolável -->
             <div id="recipesContainer" class="primary-scroll">
+                <!-- Formulário de busca -->
                 <div id="recipeFormContainer">
                     <div class="form-title center-text">
                         <span class="spacer"></span>
-                        <!-- <h3>Buscar Receitas</h3> 
-                        <div class="left-container">
-                            <md-filled-icon-button @click=${this._resetForm}>
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                    <title>eraser</title>
-                                    <path
-                                        d="M16.24,3.56L21.19,8.5C21.97,9.29 21.97,10.55 21.19,11.34L12,20.53C10.44,22.09 7.91,22.09 6.34,20.53L2.81,17C2.03,16.21 2.03,14.95 2.81,14.16L13.41,3.56C14.2,2.78 15.46,2.78 16.24,3.56M4.22,15.58L7.76,19.11C8.54,19.9 9.8,19.9 10.59,19.11L14.12,15.58L9.17,10.63L4.22,15.58Z"
-                                        fill="#ffffff"
-                                    />
-                                </svg>
-                            </md-filled-icon-button>
-                        </div>-->
                     </div>
+
                     <div class="form-container recipe-form">
+                        <!-- Restrições alimentares -->
                         <h4>Restrições</h4>
                         <div class="display-horizontal">
                             <label>
@@ -180,6 +171,7 @@ export class RecipeFinder extends LitElement {
                                 Ovo
                             </label>
                         </div>
+                        <!-- Tipo de prato -->
                         <h4>Tipo</h4>
                         <div class="display-horizontal">
                             <label>
@@ -203,10 +195,12 @@ export class RecipeFinder extends LitElement {
                                 Lanche
                             </label>
                         </div>
+                        <!-- Ingredientes -->
                         <h4>Ingredientes</h4>
                         <md-outlined-text-field id="ingredients" value="" type="textarea" rows="5" cols="60" name="Ingredientes"> </md-outlined-text-field>
                         <span class="warning">Importante: informar os ingredientes separados por vírgula</span>
 
+                        <!-- Botões de ação -->
                         <div id="btnContainer">
                             <md-filled-tonal-button @click=${this.requestRecipe}> Buscar </md-filled-tonal-button>
                             <md-filled-tonal-button @click=${this._resetForm}> Cancelar </md-filled-tonal-button>
@@ -214,6 +208,7 @@ export class RecipeFinder extends LitElement {
                     </div>
                 </div>
 
+                <!-- Resultado da busca -->
                 <div id="suggestedRecipeContainer" hidden class="container">
                     <h3>Receita</h3>
                     <div id="suggestedRecipe" class="container"></div>
@@ -222,7 +217,10 @@ export class RecipeFinder extends LitElement {
         `;
     }
 
+    // Realiza uma request de  busca de receita
     requestRecipe() {
+
+        // Coleta restrições selecionadas nos checkboxes
         const checkboxElements = this.shadowRoot.querySelectorAll("md-checkbox");
         let checkboxElemensList = [...checkboxElements];
 
@@ -232,6 +230,7 @@ export class RecipeFinder extends LitElement {
             if (element.checked) excludeIngredientsList.push(element.getAttribute("value"));
         });
 
+         // Coleta tipo de prato nos radios
         const radioElements = this.shadowRoot.querySelectorAll("md-radio");
         let radioElemensList = [...radioElements];
 
@@ -242,8 +241,11 @@ export class RecipeFinder extends LitElement {
         });
 
         const excludeIngredients = excludeIngredientsList.join(",");
+
+          // Ingredientes informados pelo usuário
         const ingredients = this.shadowRoot.querySelector(`md-outlined-text-field`)?.value;
 
+        // Validação
         if (!ingredients) {
             alert("Você deve fornecer a lista de ingredientes");
             return;
@@ -253,8 +255,11 @@ export class RecipeFinder extends LitElement {
             dishType = "breakfast";
         }
 
+        // Monta URL da request
         const url = `http://127.0.0.1:5000/buscar_receita?excludeIngredients=${excludeIngredients}&ingredients=${ingredients}&dishType=${dishType}`;
 
+
+        // Chamada ao backend
         fetch(url, {
             method: "get",
         })
@@ -262,18 +267,22 @@ export class RecipeFinder extends LitElement {
             .then((data) => {
                 console.debug(data);
 
+                // Tratamento de erros 
                 if (data.message === "Não foi possível realizar a requisição :/") {
                     this.shadowRoot.getElementById("suggestedRecipe").innerHTML = "";
                     alert("Não foi possível encontrar receitas");
                     return;
                 }
 
+
+                // Exibe container da receita
                 const suggestedRecipeContainer = this.shadowRoot.getElementById("suggestedRecipeContainer");
                 suggestedRecipeContainer.removeAttribute("hidden");
 
                 const suggestedRecipe = this.shadowRoot.getElementById("suggestedRecipe");
                 suggestedRecipe.removeAttribute("hidden");
 
+                // Monta HTML da receita
                 let recipeContent = ``;
 
                 const recipe = data;
@@ -288,6 +297,7 @@ export class RecipeFinder extends LitElement {
 
                 recipeContent += `<h5>Preparo</h5><div class="instructions-container">${recipe.instrucoes}</div>`;
 
+                 // Renderiza resultado
                 this.shadowRoot.getElementById("suggestedRecipe").innerHTML = recipeContent;
             })
             .catch((error) => {
@@ -295,6 +305,7 @@ export class RecipeFinder extends LitElement {
             });
     }
 
+     // Reseta todos os campos do formulário
     _resetForm(){
 
         const radioElements = this.shadowRoot.querySelectorAll("md-radio");

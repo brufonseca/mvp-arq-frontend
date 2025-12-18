@@ -7,6 +7,13 @@ import "@material/web/switch/switch.js";
 
 import "./form-meal-item.js";
 
+/**
+ * Mapeamento dos tipos de refeição usados no formulário.
+ * - A chave é usada internamente no frontend
+ * - ptType é o tipo esperado pelo backend
+ * - ptLabel é o texto exibido na UI
+ */
+
 const MEAL_TYPE = {
     morningSnack: {
         ptType: "LANCHE_MANHA",
@@ -26,27 +33,26 @@ const MEAL_TYPE = {
     },
 };
 
-const chevronUpSvg = svg`
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>chevron-up</title><path d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" fill="#354479" /></svg>
-`;
-
-const chevronDownSvg = svg`
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>chevron-down</title><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" fill="#354479"/></svg>
-`;
-
-const MEAL_LABELS = {
-    morningSnack: "Lanche Manhã",
-    lunch: "ALMOCO",
-    afternoonSnack: "LANCHE_TARDE",
-    dinner: "JANTAR",
-};
-
+/**
+ * Mapeamento inverso:
+ * converte o tipo vindo do backend para a chave usada no frontend
+ */
 const TIPO_REFEICAO = {
     LANCHE_MANHA: "morningSnack",
     ALMOCO: "lunch",
     LANCHE_TARDE: "afternoonSnack",
     JANTAR: "dinner",
 };
+
+// SVG do botão de recolher o item da refeição
+const chevronUpSvg = svg`
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>chevron-up</title><path d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" fill="#354479" /></svg>
+`;
+
+// SVG do botão de expandir o item da refeição
+const chevronDownSvg = svg`
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>chevron-down</title><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" fill="#354479"/></svg>
+`;
 
 export class JournalForm extends LitElement {
     static styles = [
@@ -183,11 +189,15 @@ export class JournalForm extends LitElement {
     render() {
         let mealTemplates = [];
 
+        // Criação dinâmica das seções de refeição
         for (const mealType of Object.keys(MEAL_TYPE)) {
             let template = html`
                 <div class="switch-container">
                     <label for="${mealType}Switch">${MEAL_TYPE[mealType].ptLabel}</label>
+                     <!-- Switch que ativa/desativa a refeição -->
                     <md-switch id="${mealType}Switch" meal="${mealType}" @change=${this._computeItemsVisibility}></md-switch>
+                    
+                    <!-- Botões de ação da refeição -->
                     <div id="${mealType}Btns" class="action-btn-container" hidden>
                         <md-filled-tonal-icon-button id="${mealType}HideBtn" @click=${this._toggleItem} meal="${mealType}"> ${chevronUpSvg} </md-filled-tonal-icon-button>
 
@@ -205,6 +215,7 @@ export class JournalForm extends LitElement {
                     </div>
                 </div>
 
+                <!-- Componente com os dados da refeição -->
                 <form-meal-item id="${mealType}Item" meal="${mealType}" hidden></form-meal-item>
             `;
 
@@ -234,7 +245,10 @@ export class JournalForm extends LitElement {
                     </md-filled-icon-button>
                 </div>
             </div>
+             <!-- Formulário -->
             <div id="formContainer" class="form primary-scroll">
+
+                <!-- Data do registro -->
                 <md-outlined-text-field id="entryDate" value="" type="date" required placeholder="Data"> </md-outlined-text-field>
 
                 <h4 class="primary-color">Refeições Oferecidas</h4>
@@ -243,6 +257,12 @@ export class JournalForm extends LitElement {
             </div>
         `;
     }
+
+    /**
+     * Handler do botão salvar.
+     * Processa os dados, dispara evento para o pai
+     * e envia os dados para o backend.
+     */
 
     _commitOperation(e){
 
@@ -267,6 +287,12 @@ export class JournalForm extends LitElement {
         
     }
 
+    /**
+     * Processa os dados do formulário
+     * - Valida data
+     * - Valida se há pelo menos uma refeição
+     * - Monta o objeto esperado pelo backend
+     */
     _processEntry() {
         const dateInput = this.shadowRoot.getElementById("entryDate");
         const dateValue = dateInput?.value;
@@ -315,6 +341,12 @@ export class JournalForm extends LitElement {
        return data;
     }
 
+     /**
+     * Limpa completamente o formulário
+     * - Reseta data
+     * - Desliga switches
+     * - Reseta componentes filhos
+     */
     _resetForm() {
         const entryDateElement = this.shadowRoot.getElementById("entryDate");
         entryDateElement.value = "";
@@ -408,6 +440,11 @@ export class JournalForm extends LitElement {
         mealTypeItem?.toggleAttribute("hidden");
     }
 
+
+     /**
+     * Envia os dados para o backend
+     * Usa POST para INSERT e PUT para EDIT
+     */
     postEntry(entry) {
 
         let data = {

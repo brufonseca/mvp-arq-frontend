@@ -48,10 +48,12 @@ export class MainView extends LitElement {
     render() {
         return html`
         <div id="mainContainer">
+            <!-- Componente de abas -->
             <md-tabs id="tabs" @change=${this._handleTabChange}>
                 <md-primary-tab tab="journal" active>Diário</md-primary-tab>
                 <md-primary-tab tab="recipes">Receitas</md-primary-tab>
             </md-tabs>
+            <!-- Stack de views controlada pelas abas -->
             <div id="viewStack">
                 <div id="journalTab" class="tab">
                     <meal-journal></meal-journal>
@@ -66,12 +68,19 @@ export class MainView extends LitElement {
         `;
     }
 
+    // Handler executado quando a aba ativa muda
     _handleTabChange(e){
+
+        // Recupera o valor do atributo "tab" da aba ativa
         const selectedTabName = e.target.activeTab.getAttribute("tab");
 
         const viewStack = this.shadowRoot.getElementById("viewStack");
+
+        // Seleciona apenas os filhos diretos (views)
         const views = viewStack.querySelectorAll(':scope > div');
 
+
+        // Exibe apenas a view correspondente à aba ativa
         for(const view of views){
 
             if(view.id === `${selectedTabName}Tab`){

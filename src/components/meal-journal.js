@@ -39,11 +39,6 @@ export class MealJournal extends LitElement {
                 text-align: center;
             }
 
-            .container {
-                /* width: calc(100% - 20px);
-                height: calc( 100% - ;
-                padding: 0 10px; */
-            }
 
             .left-container {
                 display: flex;
@@ -100,10 +95,12 @@ export class MealJournal extends LitElement {
     ];
 
     static properties = {
+        // Controla se o formulário está visível
         insertMode: {
             type: Boolean,
             value: false,
         },
+        // Modo atual do formulário (INSERT ou EDIT)
         mode: {
             type: String,
         },
@@ -115,15 +112,18 @@ export class MealJournal extends LitElement {
         this.mode = "INSERT";
     }
 
+    // Executado quando o componente é inserido no DOM
     connectedCallback() {
         super.connectedCallback();
 
+        // Busca os registros existentes
         this.getEntriesList();
 
         this.addEventListener("show-table", () => {
             this.insertMode = false;
         });
 
+        // Evento disparado após inserir ou editar um registr
         this.addEventListener("add-entry-to-list", (e) => {
             this.addEntryToList(e.detail.data);
         });
@@ -145,6 +145,7 @@ export class MealJournal extends LitElement {
                 </md-filled-tonal-button>
             </div>
 
+            <!-- Tabela de registros -->
             <div id="tableContainer" class="container" ?hidden="${this.insertMode}">
                 <table id="table" class="table">
                     <thead>
@@ -159,16 +160,19 @@ export class MealJournal extends LitElement {
                 </table>
             </div>
 
+            <!-- Formulário de cadastro/edição -->
             <div id="formContainer" ?hidden="${!this.insertMode}">
                 <journal-form id="form"></journal-form>
             </div>
         `;
     }
 
+     // Exibe o formulário através da flag insertMode
     _showForm() {
         this.insertMode = true;
     }
 
+    // Busca a lista de registros no backend
     getEntriesList() {
         let url = "http://127.0.0.1:5000/listar_diarios";
         fetch(url, {
@@ -176,12 +180,14 @@ export class MealJournal extends LitElement {
         })
             .then((response) => response.json())
             .then((data) => {
+                // Ordena os registros por data (mais recente primeiro)
                 const entries = data["diarios"].sort((entryA, entryB) => {
                     const dateA = new Date(entryA.data_registro);
                     const dateB = new Date(entryB.data_registro);
                     return  dateB - dateA ;
                 });
 
+                // Prepara os dados para a tabela
                 entries.forEach((entry) => {
                     let entryData = {};
                     let date = new Date(entry.data_registro);
@@ -202,6 +208,8 @@ export class MealJournal extends LitElement {
             });
     }
 
+
+    // Adiciona ou atualiza uma linha na tabela
     addEntryToList(entryData) {
         const meals = ["LANCHE_MANHA", "ALMOCO", "LANCHE_TARDE", "JANTAR"];
         const mealIdx = entryData["mealIdx"];
@@ -209,6 +217,7 @@ export class MealJournal extends LitElement {
 
         const table = this.shadowRoot.getElementById("table");
 
+        // Remove linha existente em caso de edição
         if (this.mode === "EDIT") {
             const row = this.shadowRoot.getElementById(`${date}_Row`);
             if (row) {
@@ -216,11 +225,16 @@ export class MealJournal extends LitElement {
             }
         }
 
+        // Cria nova linha
         const row = table.insertRow();
         row.id = `${date}_Row`;
+
+        // Botões de ação
         this.insertRemoveButton(row.insertCell(-1), date);
         this.insertEditButton(row.insertCell(-1), date);
 
+
+        // Insere as colunas da tabela
         let cell = row.insertCell(0);
         cell.textContent = date;
 
@@ -234,6 +248,7 @@ export class MealJournal extends LitElement {
         }
     }
 
+    // Cria um SVG dinamicamente
     createSVGElement(path) {
         const svgNamespace = "http://www.w3.org/2000/svg";
 
@@ -248,6 +263,7 @@ export class MealJournal extends LitElement {
         return svg;
     }
 
+    // Insere botão de remover
     insertRemoveButton(parent, date) {
         const removeBtn = document.createElement("md-outlined-icon-button");
         removeBtn.setAttribute("date", date);
@@ -259,6 +275,7 @@ export class MealJournal extends LitElement {
         removeBtn.onclick = () => this.removeEntryFromList(date);
     }
 
+    // Insere botão de editar
     insertEditButton(parent, date) {
         const editBtn = document.createElement("md-outlined-icon-button");
         editBtn.setAttribute("date", date);
@@ -273,6 +290,7 @@ export class MealJournal extends LitElement {
         editBtn.onclick = () => this.editEntryFromList(date);
     }
 
+    // Remove registro da tabela e  faz requisição de remove para o backend
     removeEntryFromList(entryDate) {
         const row = this.shadowRoot.getElementById(`${entryDate}_Row`);
 
@@ -286,6 +304,7 @@ export class MealJournal extends LitElement {
         }
     }
 
+     // Busca dados do registro e abre o formulário em modo edição
     editEntryFromList(entryDate) {
         const url = `http://127.0.0.1:5000/buscar_diario?data_registro=${entryDate}`;
         fetch(url, {
@@ -315,6 +334,7 @@ export class MealJournal extends LitElement {
             });
     }
 
+    // Requisição de remoção de registro para o backend
     removeEntry(entryDate) {
         let url = `http://127.0.0.1:5000/deletar_diario?data_registro=${entryDate}`;
         fetch(url, {
@@ -326,6 +346,7 @@ export class MealJournal extends LitElement {
             });
     }
 
+     // Envia dados e seta modo (edit/insert) do formulário
     setFormData(entryData) {
         const formElement = this.shadowRoot.getElementById("form");
 

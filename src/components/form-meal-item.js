@@ -3,13 +3,21 @@ import { LitElement, html, css } from "lit";
 import "@material/web/radio/radio.js";
 import "@material/web/textfield/outlined-text-field.js";
 
-
+/**
+ * Opções de método de alimentação
+ * Cada item possui:
+ * - type: valor enviado/armazenado
+ * - label: texto exibido na interface
+ */
 const MEAL_METHOD = [
     { type: "BLW", label: "BLW" },
     { type: "PARTICIPATIVO", label: "Participativo" },
     { type: "TRADICIONAL", label: "Tradicional" },
 ];
 
+/**
+ * Opções de aceitação da refeição
+ */
 const MEAL_ACCEPTANCE = [
     { type: "OTIMO", label: "Ótimo" },
     { type: "BOM", label: "Bom" },
@@ -17,6 +25,9 @@ const MEAL_ACCEPTANCE = [
     { type: "RECUSOU", label: "Recusou" },
 ];
 
+/**
+ * Avaliação geral da refeição
+ */
 const MEAL_RATING = [
     { type: "SUCESSO", label: "Sucesso" },
     { type: "OK", label: "Bom" },
@@ -59,6 +70,7 @@ export class FormMealItem extends LitElement {
 
     render() {
         return html`
+            <!-- Método de alimentação -->
             <h4>Método</h4>
             <div class="radio-container">
                 ${MEAL_METHOD.map(
@@ -70,7 +82,7 @@ export class FormMealItem extends LitElement {
                     `
                 )}
             </div>
-
+            <!-- Aceitação da refeição -->
             <h4>Aceitação</h4>
             <div class="radio-container">
                 ${MEAL_ACCEPTANCE.map(
@@ -82,7 +94,7 @@ export class FormMealItem extends LitElement {
                     `
                 )}
             </div>
-
+            <!-- Avaliação geral -->
             <h4>Avaliação Geral</h4>
 
             <div class="radio-container">
@@ -102,6 +114,16 @@ export class FormMealItem extends LitElement {
         `;
     }
 
+    /**
+     * Coleta os dados preenchidos no formulário
+     * Retorna um objeto no formato:
+     * {
+     *   metodo: "...",
+     *   aceitacao: "...",
+     *   avaliacao: "...",
+     *   comentarios: "..."
+     * }
+     */
     getData() {
         let data = {};
 
@@ -119,7 +141,10 @@ export class FormMealItem extends LitElement {
 
         return data;
     }
-
+    /**
+     * Preenche o formulário a partir de um objeto de dados
+     * Usado principalmente no modo de edição
+     */
     setData(data) {
         for (const attr of Object.keys(data)) {
             const value = data[attr];
@@ -139,7 +164,11 @@ export class FormMealItem extends LitElement {
             }
         }
     }
-
+    /**
+     * Reseta completamente o formulário
+     * - Desmarca todos os radios
+     * - Limpa o campo de comentários
+     */
     resetData() {
         const radioElements = this.shadowRoot.querySelectorAll("md-radio");
         const commentsElement = this.shadowRoot.querySelectorAll("md-outlined-text-field");
