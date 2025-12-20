@@ -102,7 +102,7 @@ Acesse no navegador:
 
 ### 🐳 Docker Compose (Frontend + Backend)
 
-Este projeto inclui um arquivo **docker-compose.yml** na raiz do projeto, responsável por subir **tanto o frontend quanto o backend** juntos.  
+Este projeto inclui um arquivo **docker-compose.yaml** na raiz do projeto, responsável por subir **tanto o frontend quanto o backend** juntos.  
 Isso facilita o desenvolvimento e garante que os dois serviços conversem corretamente dentro da mesma rede Docker.
 
 **Os comandos a seguir devem ser executados na raiz do repositório e com privilégios de administrador ou usuário pertencente ao grupo docker**
