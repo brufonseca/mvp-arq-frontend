@@ -116,8 +116,7 @@ Após subir:
 
 Frontend → http://localhost:8080
 
-Backend Flask → http://localhost:5000 (porta definida no docker-compose.yml) 
-
+Backend Flask → http://localhost:5000
 
 
   
